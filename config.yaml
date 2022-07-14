@@ -1,0 +1,26 @@
+options:
+  active:
+    type: boolean
+    default: False
+    description: "Whether or not the charm should be active (aka loop around producing results/events)"
+  active-period:
+    type: int
+    default: 5
+    description: "Period in which charm should be 'active'."
+  sleep-period:
+    type: int
+    default: 5
+    description: "Period to sleep when actively simulating doing something."
+  string-option:
+    type: string
+    default: "Default Value"
+    description: "A short description of the configuration option"
+  boolean-option:
+    type: boolean
+    default: False
+    description: "A short description of the configuration option"
+  int-option:
+    type: int
+    default: 9001
+    description: "A short description of the configuration option"
+
