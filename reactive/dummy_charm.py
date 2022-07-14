@@ -12,14 +12,21 @@ from charmhelpers.core import hookenv
 def install_dummy_charm():
     hookenv.status_set('maintenance', 'Installing important packages')
     apt.queue_install(['cowsay'])
-    hookenv.status_set('idle', 'Important packages installed')
+    hookenv.status_set('waiting', 'Important packages installed. Waiting for activation.')
     reactive.set_flag('dummy-charm.installed')
 
 
 @reactive.when('config.changed.active')
 def change_activity_state():
-    hookenv.log("Activating charm")
-    reactive.set_flag('dummy-charm.active')
+    config = hookenv.config()
+    active = config.get("active")
+    hookenv.log("'active' changed in config: %s" % active)
+    if active:
+        hookenv.log("Activating charm from config change")
+        reactive.set_flag('dummy-charm.active')
+    else:
+        hookenv.log("Deactivating charm from config change")
+        reactive.clear_flag('dummy-charm.active')
 
 
 @reactive.when('dummy-charm.active')
@@ -32,7 +39,7 @@ def do_activity():
     time.sleep(active_period)
     hookenv.log("Charm finished doing something for %d seconds" % active_period)
     reactive.clear_flag('dummy-charm.active')
-    hookenv.status_set('idle', 'Waiting for reactivation')
+    hookenv.status_set('waiting', 'Waiting for reactivation')
 
 
 @reactive.when_not('dummy-charm.active')
@@ -40,13 +47,14 @@ def sleep_between_activities():
     config = hookenv.config()
     sleep_period = int(config.get("sleep-period"))
     hookenv.log("Charm will now sleep %d seconds" % sleep_period)
-    hookenv.status_set('idle', 'Sleeping %d seconds' % sleep_period)
+    hookenv.status_set('maintenance', 'Sleeping %d seconds' % sleep_period)
     time.sleep(sleep_period)
     hookenv.log("Charm finished sleeping %d between activities" % sleep_period)
+    hookenv.log("Re-activating charm")
     reactive.set_flag('dummy-charm.active')
 
 
 @reactive.when_not('dummy-charm.active')
 def deactivate_charm():
-    hookenv.log("deactivated charm")
+    hookenv.log("Deactivating charm")
     reactive.clear_flag('dummy-charm.active')
