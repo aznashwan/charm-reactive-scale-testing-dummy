@@ -11,7 +11,7 @@ from charmhelpers.core import hookenv
 @reactive.when_not('dummy-charm.installed')
 def install_dummy_charm():
     hookenv.status_set('maintenance', 'Installing important packages')
-    apt.queue_install(['cowsay'])
+    # apt.queue_install(['cowsay'])
     hookenv.status_set('waiting', 'Important packages installed. Waiting for activation.')
     reactive.set_flag('dummy-charm.installed')
 
